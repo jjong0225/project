@@ -443,7 +443,6 @@ int main(void)
 		}
 	}
 	return 0;
-=======
   system("clear");
    name_put();
    map_load(maporder);
