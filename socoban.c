@@ -214,7 +214,7 @@ int move(char player[6][box_row][box_line]) {//@의 행동을 총괄하는 함�
 				 printf("도움말을 보여줍니다 \n");
 				 sleep(1);
 				 system("clear");
-				 printf("\n\n\n\n n(왼쪽), k(아래), j(위), l(오른쪽)\n");
+				 printf("\n\n\n\n h(왼쪽), k(아래), j(위), l(오른쪽)\n");
 				 printf("u(undo)\n");
 				 printf("r(replay)\n");
 				 printf("n(new)\n");
