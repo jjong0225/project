@@ -196,10 +196,10 @@ void map_display(){//게임의 진행 현황을 표시하는 함수이며 기본
 }
 
 
-int move(char player[6][box_row][box_line]) {
-	input_char = getch();
+int move(char player[6][box_row][box_line]) {//@의 행동을 총괄하는 함수이며 커맨드를 입력받은 후 switch를 통해 원하는 기능으로 제어가 넘어가도록 한다.
+	input_char = getch();// getch를 사용하여 키보드로 input_char에 문자를 입력받음.
 	switch (input_char) {
-		case 'u' : {
+		case 'u' : {//undo의 역할을 하는 case이며 shadow를 거꾸로 실행한다고 생각하면 쉽다, 배열을 거꾸로 배정하여 이전의 위치로 돌아갈 수 있도록 만든다.
 				   if(before < 5){
 					   for(int i = 0; i <= box_row * box_line - 2; i++){
 						   for(int k = 0; k <= 4; k++)
@@ -242,6 +242,39 @@ int move(char player[6][box_row][box_line]) {
 
 			 }
 			 break;
+			
+			case 'n': {// 새로히 게임을 실행할 수 있게하는 case이며 undo의 가능횟수를 초기화 하고 main함수에서 새로히 재귀함수의 개념으로 게임이 실행되도록 하기위해 간접적으로
+              //변수(new_count)를 조절하는 방법을 취했다
+               printf("n\n");
+               sleep(1);
+               printf("1단계 맵부터 다시 시작합니다\n");
+               sleep(1);
+               new_count++;
+               maporder = 1, before = 0, line = 0, row = 0, count = 0, Ocount = -1;
+               for (int i = 0; i <= 19; i++)
+                  O[i] = 0;
+               break;
+            }
+			
+			case 'e': {// 게임을 종료하는 기능으로 저장이 안되어 있다면 종료를 할 수 없게 s_count라는 변수를 두어 제어하였다.
+               printf("e\n");
+               sleep(1);
+               if (s_count >= 1) {
+                  printf("SEE YOU...  ");
+                  for(int i = 0; i <= 9; i++){
+                    if(name[i] == 0)
+                      printf("");
+                    else
+                        printf("%c",name[i]);
+                  }
+                  sleep(1);
+                  exit(1);
+               }
+               if (s_count == 0)
+                  printf("저장하고 종료해주세요\n");
+               sleep(1);
+               break;
+            }
 
 		case 'd' : {
 				   if(player[0][row][line+1] == '#')
@@ -394,6 +427,11 @@ int move(char player[6][box_row][box_line]) {
 				   map_display(player);
 				   break;
 			   }
+			
+			case 'v' : {//다음 스테이지로 넘어가게하는 case이며 가장 아래에 위치해 있기 때문에 break를 따로 두지 않았다.
+              //다음 맵으로 이동하게 Ocount를 -1 로초기화 하였다.
+              Ocount = -1;
+            }
 		default : break;
 	}
 	return 0;
