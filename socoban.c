@@ -74,16 +74,6 @@ void finderror(){//박스의 개수와 보관장소의 개수가 같은지 확�
 }
 
 
-
-
-
-void map_memorize(char player[6][box_row][box_line]){
-	for (int i=0 ; i<=box_row * box_line - 2 ; i++)
-		player[0][0][i] = memorize [0][0][i];
-		for (int k=0; k<=4; k++){
-		for(int i = 0; i <= box_row * box_line-2; i++)
-			player[k+1][0][i] = player[k][0][i];
-}
 }
 
 void map_load(int a){//map파일을 읽게 하는 함수이며 map_display라는 함수에서 출력하기 위한 배열을 배정한다.
@@ -224,14 +214,14 @@ int move(char player[6][box_row][box_line]) {//@의 행동을 총괄하는 함�
 				 printf("도움말을 보여줍니다 \n");
 				 sleep(1);
 				 system("clear");
-				 printf("\n\n\n\na(왼쪽), s(아래), w(위), d(오른쪽)\n");
+				 printf("\n\n\n\n n(왼쪽), k(아래), j(위), l(오른쪽)\n");
 				 printf("u(undo)\n");
 				 printf("r(replay)\n");
 				 printf("n(new)\n");
 				 printf("e(exit)\n");
-				 printf("l(save)\n");
+				 printf("s(save)\n");
 				 printf("f(file load)\n");
-				 printf("k(display help)\n");
+				 printf("d(display help)\n");
 				 printf("t(top)\n\n\n\n\n\n");
 				 printf("맵으로 돌아가실거면 아무키나 눌러주세요\n");
 
@@ -276,115 +266,91 @@ int move(char player[6][box_row][box_line]) {//@의 행동을 총괄하는 함�
                break;
             }
 
-		case 'd' : {
-				   if(player[0][row][line+1] == '#')
-					   break;
-				   if(player[0][row][line+1] == '$')
-				   {
-					   if(player[0][row][line+2] == '#' || player[0][row][line+2] == '$')
-						   break;
-					   for(int i = 0; i <= box_row * box_line - 2; i++){
-						   for(int k = 4; k > -1; k--)
-							   player[k + 1][0][i] = player[k][0][i];
-					   }
-					   line += 1;
-					   player[0][row][line-1] = ' ';
-					   player[0][row][line] = '@';
-					   player[0][row][line+1] = '$';
-					   break;
-				   }
-				   for(int i = 0; i <= box_row * box_line - 2; i++){
-					   for(int k = 4; k > -1; k--)
-						   player[k + 1][0][i] = player[k][0][i];
-				   }
-				   player[0][row][line] =' ';
-				   line+=1;
-				   player[0][row][line] ='@';
+		case 'l' : {//case 'l', case'k', case'j', case'h'는 상하좌우로 이동하게하는 기능이며 제어구문을 통해 장애물에 맞닥뜨릴때의 경우에 따라 움직일 수 없게 break를 두었다.
+        //그리고 움직임으로 인해 배열에 변화를 처리 하기 위해 움직임이 반영될 수 있는 경우에 shadow함수를 먼저 두어 undo를 위해
+        //현재의 상태를 다른 배열에 저장해 두고 배열을 바꾸었다.
+               if(player[0][row][line+1] == '#') //플레이어가 이동해야할 좌표가 벽이라면 움직이지 않음.
+                  break;
+               if(player[0][row][line+1] == '$')//플레이어가 이동해야할 좌표에 박스있는경우
+               {
+                  if(player[0][row][line+2] == '#' || player[0][row][line+2] == '$')//플레이어가 상자를 밀었을때 상자의 위치에 벽이나 상자가 있으면 플레이어와 상자 모두 움직이지 않음.
+                     break;
+                  shadow();
+                  line += 1;
+                  player[0][row][line-1] = ' ';
+                  player[0][row][line] = '@';
+                  player[0][row][line+1] = '$';
+                  break;
+               }
+               shadow();
+               player[0][row][line] =' ';
+               line+=1;
+               player[0][row][line] ='@';
 
-			   }
-			   break;
+            }
+            break;
 
-		case 'a' : {
-				   if(player[0][row][line-1] == '#')
-					   break;
-				   if(player[0][row][line-1] == '$')
-				   {
-					   if(player[0][row][line-2] == '#' || player[0][row][line-2] == '$')
-						   break;
-					   for(int i = 0; i <= box_row * box_line - 2; i++){
-						   for(int k = 4; k > -1; k--)
-							   player[k + 1][0][i] = player[k][0][i];
-					   }
-					   line -= 1;
-					   player[0][row][line+1] = ' ';
-					   player[0][row][line] = '@';
-					   player[0][row][line-1] = '$';
-					   break;
-				   }
-				   for(int i = 0; i <= box_row * box_line - 2; i++){
-					   for(int k = 4; k > -1; k--)
-						   player[k + 1][0][i] = player[k][0][i];
-				   }
-				   player[0][row][line] =' ';
-				   line-=1;
-				   player[0][row][line] ='@';
-			   }
-			   break;
+      case 'h' : {
+               if(player[0][row][line-1] == '#')//플레이어가 이동해야할 좌표가 벽이라면 움직이지 않음.
+                  break;
+               if(player[0][row][line-1] == '$')//플레이어가 이동해야할 좌표에 박스있는경우
+               {
+                  if(player[0][row][line-2] == '#' || player[0][row][line-2] == '$')//플레이어가 상자를 밀었을때 상자의 위치에 벽이나 상자가 있으면 플레이어와 상자 모두 움직이지 않음.
+                     break;
+                   shadow();
+                  line -= 1;
+                  player[0][row][line+1] = ' ';
+                  player[0][row][line] = '@';
+                  player[0][row][line-1] = '$';
+                  break;
+               }
+               shadow();
+               player[0][row][line] =' ';
+               line-=1;
+               player[0][row][line] ='@';
+            }
+            break;
+      case 'k' : {
+               if(player[0][row-1][line] == '#')//플레이어가 이동해야할 좌표가 벽이라면 움직이지 않음.
+                  break;
+               if(player[0][row-1][line] == '$')//플레이어가 이동해야할 좌표에 박스있는경우
+               {
+                  if(player[0][row-2][line] == '#' || player[0][row-2][line] == '$')//플레이어가 상자를 밀었을때 상자의 위치에 벽이나 상자가 있으면 플레이어와 상자 모두 움직이지 않음.
+                     break;
+                   shadow();
+                  row -= 1;
+                  player[0][row+1][line] = ' ';
+                  player[0][row][line] = '@';
+                  player[0][row-1][line] = '$';
+                  break;
+               }
+               shadow();
+               player[0][row][line] =' ';
+               row-=1;
+               player[0][row][line] ='@';
+            }
+            break;
 
-
-		case 'w' : {
-				   if(player[0][row-1][line] == '#')
-					   break;
-				   if(player[0][row-1][line] == '$')
-				   {
-					   if(player[0][row-2][line] == '#' || player[0][row-2][line] == '$')
-						   break;
-					   for(int i = 0; i <= box_row * box_line - 2; i++){
-						   for(int k = 4; k > -1; k--)
-							   player[k + 1][0][i] = player[k][0][i];
-					   }
-					   row -= 1;
-					   player[0][row+1][line] = ' ';
-					   player[0][row][line] = '@';
-					   player[0][row-1][line] = '$';
-					   break;
-				   }
-				   for(int i = 0; i <= box_row * box_line - 2; i++){
-					   for(int k = 4; k > -1; k--)
-						   player[k + 1][0][i] = player[k][0][i];
-				   }
-				   player[0][row][line] =' ';
-				   row-=1;
-				   player[0][row][line] ='@';
-			   }
-			   break;
-
-		case 's' : {
-				   if(player[0][row+1][line] == '#')
-					   break;
-				   if(player[0][row+1][line] == '$')
-				   {
-					   if(player[0][row+2][line] == '#' || player[0][row+2][line] == '$')
-						   break;
-					   for(int i = 0; i <= box_row * box_line - 2; i++){
-						   for(int k = 4; k > -1; k--)
-							   player[k + 1][0][i] = player[k][0][i];
-					   }
-					   row += 1;
-					   player[0][row-1][line] = ' ';
-					   player[0][row][line] = '@';
-					   player[0][row+1][line] = '$';
-					   break;
-				   }
-				   for(int i = 0; i <= box_row * box_line - 2; i++){
-					   for(int k = 4; k > -1; k--)
-						   player[k + 1][0][i] = player[k][0][i];
-				   }
-				   player[0][row][line] =' ';
-				   row+=1;
-				   player[0][row][line] ='@';
-			   }
-			   break;
+      case 'j' : {
+               if(player[0][row+1][line] == '#')//플레이어가 이동해야할 좌표가 벽이라면 움직이지 않음.
+                  break;
+               if(player[0][row+1][line] == '$')//플레이어가 이동해야할 좌표에 박스있는경우
+               {
+                  if(player[0][row+2][line] == '#' || player[0][row+2][line] == '$')//플레이어가 상자를 밀었을때 상자의 위치에 벽이나 상자가 있으면 플레이어와 상자 모두 움직이지 않음.
+                     break;
+                  shadow();
+                  row += 1;
+                  player[0][row-1][line] = ' ';
+                  player[0][row][line] = '@';
+                  player[0][row+1][line] = '$';
+                  break;
+               }
+               shadow();
+               player[0][row][line] =' ';
+               row+=1;
+               player[0][row][line] ='@';
+            }
+            break;
 
 			    case 'l' :{
 			      FILE *sfp;
@@ -413,20 +379,21 @@ int move(char player[6][box_row][box_line]) {//@의 행동을 총괄하는 함�
 				   break;
 			   }
 
-		case 'r' : {
-				   printf("r\n");
-				   sleep(1);
-				   printf("처음부터 다시 시작합니다\n");
-				   sleep(1);
-				   line=0 ,row=0, box_line=1 ,box_row=1, count=0, Ocount = -1;
-				   for(int i=0; i<=19; i++)
-					   O[i] = 0;
-				   map_load(0);
-				   map_memorize(player);
-				   system("clear");
-				   map_display(player);
-				   break;
-			   }
+		
+			case 'r' : {//현재의 스테이지에서 처음부터 새로 하기위해 위치를 초기화 하였다.
+        //case'n'과 다른 점은 진행중인 스테이지만 초기화 하면 되기 때문에 현재 불러온 배열만 초기화 한 후 에 map_display를 사용하면 되었다.
+                  printf("r\n");
+                  sleep(1);
+                  printf("처음부터 다시 시작합니다\n");
+                  sleep(1);
+                  line=0 ,row=0, Ocount = -1, before = 0;
+                  for(int i=0; i<=19; i++)
+                     O[i] = 0;
+                  map_load(maporder);
+                  system("clear");
+                  map_display();
+                  break;
+               }
 			
 			case 'v' : {//다음 스테이지로 넘어가게하는 case이며 가장 아래에 위치해 있기 때문에 break를 따로 두지 않았다.
               //다음 맵으로 이동하게 Ocount를 -1 로초기화 하였다.
@@ -442,25 +409,30 @@ int move(char player[6][box_row][box_line]) {//@의 행동을 총괄하는 함�
 
 int main(void)
 {
-	system("clear");
-	map_load(0);
-	char player[6][box_row][box_line];
-	map_memorize(player);
-	map_display(player);
-	while (1){
-		move (player);
-		system("clear");
-		dolcount = -1;      //O도 0부터 셌기 때문에 $ 도 0부터 세기 위해
-		for(int n=0;n<=Ocount;n++){
-			if(player[0][0][O[n]] == ' ' || player[0][0][O[n]] == 0)
-				player[0][0][O[n]] = 'O';
-			if(player[0][0][O[n]] == '$')
-				dolcount++;
-		}
-		system("clear");
-		map_display(player);
-		if(dolcount == Ocount)
-			printf("다음 스테이지로 넘어갑니다."); // 이 부분에서 맵이 넘어감. 추가할 부분
-	}
-	return 0;
+  system("clear");
+   name_put();
+   map_load(maporder);
+   map_display();
+   while (1){
+      move ();
+      if (new_count == 1) {//move함수에서 case'n'을 위해서
+         new_count--;
+         main();
+      }
+      dolcount = -1;      //O도 0부터 셌기 때문에 $ 도 0부터 세기 위해
+      for(int n=0;n<=Ocount;n++){
+         if(player[0][0][O[n]] == ' ' || player[0][0][O[n]] == 0)
+            player[0][0][O[n]] = 'O';
+         if(player[0][0][O[n]] == '$')
+            dolcount++;
+      }
+      map_display();
+      if(dolcount == Ocount){
+         printf("\n다음 스테이지로 넘어갑니다.\n"); // 이 부분에서 맵이 넘어감. 추가할 부분
+         sleep(1);
+         maporder++;
+         main();
+       }
+   }
+   return 0;
 }
